@@ -59,6 +59,7 @@ public partial class WebApplicationFactory<TEntryPoint> : IDisposable, IAsyncDis
     public WebApplicationFactory()
     {
         _configuration = ConfigureWebHost;
+        EnsureServer(); // Might break the purpose of the DeferredHostBuilder?
     }
 
     /// <summary>
