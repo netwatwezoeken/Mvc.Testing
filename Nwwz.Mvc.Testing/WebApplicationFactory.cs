@@ -3,6 +3,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Text.Json;
@@ -58,10 +59,18 @@ public partial class WebApplicationFactory<TEntryPoint> : IDisposable, IAsyncDis
     /// </summary>
     public WebApplicationFactory()
     {
-        _configuration = ConfigureWebHost;
-        EnsureServer(); // Might break the purpose of the DeferredHostBuilder?
+        _configuration = ConfigureWebHostWithKestrel;
     }
 
+    public string ServerAddress
+    {
+        get
+        {
+            EnsureServer();
+            return ClientOptions.BaseAddress.ToString();
+        }
+    }
+    
     /// <summary>
     /// Finalizes an instance of the <see cref="WebApplicationFactory{TEntryPoint}"/> class.
     /// </summary>
@@ -104,7 +113,7 @@ public partial class WebApplicationFactory<TEntryPoint> : IDisposable, IAsyncDis
     /// <summary>
     /// Gets the <see cref="WebApplicationFactoryClientOptions"/> used by <see cref="CreateClient()"/>.
     /// </summary>
-    public WebApplicationFactoryClientOptions ClientOptions { get; private set; } = new WebApplicationFactoryClientOptions();
+    private WebApplicationFactoryClientOptions ClientOptions { get; init; } = new();
 
     /// <summary>
     /// Creates a new <see cref="WebApplicationFactory{TEntryPoint}"/> with a <see cref="IWebHostBuilder"/>
@@ -455,6 +464,16 @@ public partial class WebApplicationFactory<TEntryPoint> : IDisposable, IAsyncDis
     /// <param name="builder">The <see cref="IWebHostBuilder"/> for the application.</param>
     protected virtual void ConfigureWebHost(IWebHostBuilder builder)
     {
+    }
+    
+    /// <summary>
+    /// Gives a fixture an opportunity to configure the application before it gets built.
+    /// </summary>
+    /// <param name="builder">The <see cref="IWebHostBuilder"/> for the application.</param>
+    private void ConfigureWebHostWithKestrel(IWebHostBuilder builder)
+    {
+        builder.ConfigureKestrel(o => o.Listen(IPAddress.Loopback, 0));
+        ConfigureWebHost(builder);
     }
 
     /// <summary>
