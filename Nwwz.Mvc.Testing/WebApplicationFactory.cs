@@ -223,12 +223,14 @@ public partial class WebApplicationFactory<TEntryPoint> : IDisposable, IAsyncDis
         });
         _host = CreateHost(hostBuilder);
         _server = _host.Services.GetRequiredService<IServer>();
-        var addresses = _server.Features.Get<IServerAddressesFeature>();  
-    
-        ClientOptions.BaseAddress = addresses!.Addresses  
-            .Select(x => new Uri(x))  
+        var addresses = _server.Features.Get<IServerAddressesFeature>();
+        
+        ClientOptions.BaseAddress = addresses!.Addresses
+            .Select(x => new Uri(x.Replace("://127.0.0.1", "://localhost")))  
             .Last(); 
     }
+
+    public bool UseHttps { get; set; } = true;
 
     private void SetContentRoot(IWebHostBuilder builder)
     {
@@ -472,7 +474,17 @@ public partial class WebApplicationFactory<TEntryPoint> : IDisposable, IAsyncDis
     /// <param name="builder">The <see cref="IWebHostBuilder"/> for the application.</param>
     private void ConfigureWebHostWithKestrel(IWebHostBuilder builder)
     {
-        builder.ConfigureKestrel(o => o.Listen(IPAddress.Loopback, 0));
+        builder.ConfigureKestrel((context, serverOptions) =>
+        {
+            if (UseHttps)
+            {
+                serverOptions.Listen(IPAddress.Loopback, 0, listenOptions => { listenOptions.UseHttps(); });
+            }
+            else
+            {
+                serverOptions.Listen(IPAddress.Loopback, 0);
+            }
+        });
         ConfigureWebHost(builder);
     }
 
