@@ -24,6 +24,9 @@ namespace Nwwz.Mvc.Testing;
 /// </summary>
 /// <typeparam name="TEntryPoint">A type in the entry point assembly of the application.
 /// Typically the Startup or Program classes can be used.</typeparam>
+#if NET10_0_OR_GREATER
+[Obsolete("Since .NET 10 UseKestrel() is available in the standard WebApplicationFactory", error: false)]
+#endif
 public partial class WebApplicationFactory<TEntryPoint> : IDisposable, IAsyncDisposable where TEntryPoint : class
 {
     private bool _disposed;

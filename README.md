@@ -1,7 +1,11 @@
+# 🚨This package is obsolete and no longer maintained🚨
+
+With .NET 10 is now possible to expose endpoints using Kestrel. Therefore this package is no longer needed. Please update to dotnet 10 and see my blog post for more details https://blog.netwatwezoeken.nl/integration-testing-with-dotnet-10-and-playwright/ and see how to leverage the new `UseKestrel()`.
+
 # Mvc.Testing
 Alternative to [Microsoft.AspNetCore.Mvc.Testing](https://www.nuget.org/packages/Microsoft.AspNetCore.Mvc.Testing) implementation to enable testing using actual endpoints.
 
-This package provides an alternative WebApplicationFactory implementation. Instead using a [TestServer](https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.testhost.testserver) it spins up Kestrel to expose listen to a port over the network. This allows a browser to access the application in a test scenario. Ideal to use in combination with [Playwirght](https://playwright.dev/dotnet/) for instance.
+This package provides an alternative WebApplicationFactory implementation. Instead of using a [TestServer](https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.testhost.testserver) it spins up Kestrel to expose listen to a port over the network. This allows a browser to access the application in a test scenario. Ideal to use in combination with [Playwright](https://playwright.dev/dotnet/) for instance.
 
 While the [same is possible using Microsoft.AspNetCore.Mvc.Testing](https://danieldonbavand.com/2022/06/13/using-playwright-with-the-webapplicationfactory-to-test-a-blazor-application/). The method leaves you with a duplicate Host and will cause `ConfigureWebHost` to be invoked twice. This project is a copy of [Microsoft's WebApplicationFactory](https://github.com/dotnet/aspnetcore/tree/main/src/Mvc/Mvc.Testing/src) but it invokes Kerstel instead of the TestServer. The advantage is that you no longer need to worry about any side effect that might occur when `ConfigureWebHost` is called twice.  
 
@@ -11,6 +15,7 @@ While the [same is possible using Microsoft.AspNetCore.Mvc.Testing](https://dani
 
 `dotnet add package Nwwz.Mvc.Testing`
 2. Create a custom class that inherits from the `WebApplicationFactory`:
+
 ```csharp
 internal class CustomWebApplicationFactory : Nwwz.Mvc.Testing.WebApplicationFactory<Program>
 {
